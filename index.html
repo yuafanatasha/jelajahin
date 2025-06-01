@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="author" content="Untree.co">
+  <link rel="shortcut icon" href="images/logo-jelajahin.png">
+
+  <meta name="description" content="" />
+  <meta name="keywords" content="bootstrap, bootstrap4" />
+
+  <!-- Bootstrap CSS -->
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <link href="css/tiny-slider.css" rel="stylesheet">
+  <link href="css/style.css" rel="stylesheet">
+
+  <!-- Swiper CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+
+  <title>Home | Jelajahin</title>
+
+  <style>
+	.hero {
+	position: relative;
+	height: 100vh;
+	overflow: hidden;
+	}
+
+	/* Pastikan background image tidak menutupi elemen di bawah */
+	.swiper-container {
+	width: 100%;
+	height: 100%;
+	z-index: 1;
+	position: relative;
+	}
+
+	.swiper-slide {
+	background-size: cover;
+	background-position: center;
+	width: 100%;
+	height: 100%;
+	z-index: 1;
+	}
+
+	/* Teks di atas background */
+	.hero-content {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(44, 44, 44, 0.5); /* semi-transparan gelap */
+	color: white;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	padding: 2rem;
+	z-index: 2; /* pastikan lebih tinggi dari slide */
+	}
+
+	/* Tidak perlu lagi menyembunyikan img karena sudah pakai background-image */
+	.swiper-slide img {
+	display: none;
+	}
+
+  </style>
+</head>
+
+<body>
+
+  <!-- Start Header/Navigation -->
+  <nav class="custom-navbar navbar navbar-expand-md navbar-dark bg-dark" aria-label="Furni navigation bar">
+    <div class="container">
+      <img src="images/logoteks.png" width="150px" alt="Logo">
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsFurni" aria-controls="navbarsFurni" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarsFurni">
+        <ul class="custom-navbar-nav navbar-nav ms-auto mb-2 mb-md-0">
+          <li class="nav-item active">
+            <a class="nav-link" href="index.html">Home</a>
+          </li>
+          <li><a class="nav-link" href="webmap2.html">Web Map</a></li>
+          <li><a class="nav-link" href="dashboard.html">Dashboard</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <!-- End Header/Navigation -->
+
+<!-- Start Hero Section -->
+<div class="hero">
+	<!-- Swiper -->
+	<div class="swiper-container">
+	  <div class="swiper-wrapper">
+		<div class="swiper-slide" style="background-image: url('images/jalan1.jpg');"></div>
+		<div class="swiper-slide" style="background-image: url('images/jalan2.jpg');"></div>
+		<div class="swiper-slide" style="background-image: url('images/jalan3.jpg');"></div>
+	  </div>
+	</div>
+  
+	<!-- Overlay Content -->
+	<div class="hero-content">
+	  <div class="container">
+		<h1>Jelajah Jalan dan Gang di Tegalrejo Yuk!</h1>
+		<p class="mb-4">Jelajahin merupakan platform yang menyajikan visualisasi seluruh jalan dan gang yang ada di Kemantren Tegalrejo.<br>Klik tombol berikut ini untuk mengeksplor platform ini lebih jauh!</p>
+		<p><a href="webmap2.html" class="btn btn-secondary me-2">Explore Web Map</a></p>
+	  </div>
+	</div>
+  </div>
+  <!-- End Hero Section -->
+
+  
+
+  <!-- Footer -->
+  <footer id="footer" class="footer light-background">
+    <div class="container">
+      <div class="copyright text-center">
+        <p>© <span>Copyright</span> <strong class="px-1 sitename">Jelajahin</strong> <span>All Rights Reserved</span></p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/bootstrap.bundle.min.js"></script>
+  <script src="js/tiny-slider.js"></script>
+  <script src="js/custom.js"></script>
+
+  <!-- Swiper JS -->
+  <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+  <script>
+    const swiper = new Swiper('.swiper-container', {
+      loop: true,
+      autoplay: {
+        delay: 5000,
+        disableOnInteraction: false,
+      },
+      effect: 'fade',
+      speed: 1000,
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,348 @@
+<!-- /*
+* Bootstrap 5
+* Template Name: Furni
+* Template Author: Untree.co
+* Template URI: https://untree.co/
+* License: https://creativecommons.org/licenses/by/3.0/
+*/ -->
+<!doctype html>
+<html lang="en">
+
+<style>
+	.hero {
+    padding-bottom: 80px;
+    min-height: 100vh; /* Biar tinggi minimal 1 layar */
+    overflow-y: auto;   /* Aktifin scroll kalo kontennya lebih panjang */
+  }
+
+  /* Optional biar footer gak nutupin konten */
+	.body {
+		padding-bottom: 100px;
+		overflow-y: auto;
+  }
+
+</style>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="author" content="Untree.co">
+  <link rel="shortcut icon" href="images/logo-jelajahin.png">
+
+  <meta name="description" content="" />
+  <meta name="keywords" content="bootstrap, bootstrap4" />
+
+		<!-- Bootstrap CSS -->
+		<link href="css/bootstrap.min.css" rel="stylesheet">
+		<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+		<link href="css/tiny-slider.css" rel="stylesheet">
+		<link href="css/style.css" rel="stylesheet">
+		<title>Jelajahin </title>
+
+		<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+	</head>
+
+	<body>
+
+		<!-- Start Header/Navigation -->
+		<nav class="custom-navbar navbar navbar navbar-expand-md navbar-dark bg-dark" arial-label="Furni navigation bar">
+
+			<div class="container">
+				<img src="images/logoteks.png" width="150px" alt="Logo">
+
+				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsFurni" aria-controls="navbarsFurni" aria-expanded="false" aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+
+				<div class="collapse navbar-collapse" id="navbarsFurni">
+					<ul class="custom-navbar-nav navbar-nav ms-auto mb-2 mb-md-0">
+						<li><a class="nav-link" href="index.html">Home</a></li>
+						<li><a class="nav-link" href="webmap2.html">Web Map</a></li>
+						<li class="nav-item active"><a class="nav-link" href="dashboard.html">Dashboard</a></li>
+					</ul>
+
+					<ul class="custom-navbar-cta navbar-nav mb-2 mb-md-0 ms-5 navmenu">
+						
+					</ul>
+					  
+				</div>
+			</div>
+				
+		</nav>
+		<!-- End Header/Navigation -->
+
+		<!-- Start Hero Section -->
+		<!-- Start Hero Section -->
+		<div class="hero pt-5 mt-5">
+			<div class="container">
+			
+			<div class="row justify-content-center text-center">
+				<div class="col-lg-8">
+				<div class="intro-excerpt">
+					
+				</div>
+				</div>
+			</div>
+			<div class="row justify-content-center mb-4">
+				<div class="col-md-6">
+				  <div class="p-3 border rounded shadow-sm bg-white">
+					<h5 class="text-center mb-3">Distribusi Jalan / Gang</h5>
+					<div id="pieChart"></div>
+				  </div>
+				</div>
+			  </div>
+			<!-- Kontainer Chart kondisi perkerasan -->
+			<div class="row justify-content-center">
+				<!-- Chart container -->
+				<div class="col-md-6 mb-4">
+				<div class="p-3 border rounded shadow-sm bg-white">
+					<div id="chart"></div>
+				</div>
+				</div>
+		
+				<!-- Kontainer Chart jenis perkerasan -->
+				<div class="col-md-6 mb-4">
+				<div class="p-3 border rounded shadow-sm bg-white">
+				<div id="chart2"></div>
+				</div>
+
+				
+			</div>
+			</div>
+			</div>
+		</div>
+  <!-- End Hero Section -->
+  
+		<!-- End Hero Section -->
+
+		<footer id="footer" class="footer light-background">
+
+			<div class="container">
+			  <div class="copyright text-center "z>
+				<p>© <span>Copyright</span> <strong class="px-1 sitename">Jelajahin</strong> <span>All Rights Reserved<br></span></p>
+			  </div>
+			</div>
+		
+		</footer>
+
+
+		<script src="js/bootstrap.bundle.min.js"></script>
+		<script src="js/tiny-slider.js"></script>
+		<script src="js/custom.js"></script>
+
+		<script>
+
+		fetch('uji2.geojson')
+		.then(response => response.json())
+		.then(geojson => {
+			// === CHART 1: Kondisi Jalan ===
+			const kelurahanData = {};
+			geojson.features.forEach(feature => {
+			const props = feature.properties;
+			const kelurahan = props["Kelurahan"];
+			const kondisi = props["Kondisi Jalan"];
+			if (!kelurahan || !kondisi) return;
+
+			if (!kelurahanData[kelurahan]) {
+				kelurahanData[kelurahan] = {
+				"Baik": 0,
+				"Kerusakan sedang": 0,
+				"Kerusakan parah": 0
+				};
+			}
+
+			if (["Baik", "Kerusakan sedang", "Kerusakan parah"].includes(kondisi)) {
+				kelurahanData[kelurahan][kondisi]++;
+			}
+			});
+
+			const categories1 = Object.keys(kelurahanData);
+			const baikData = categories1.map(kel => kelurahanData[kel]["Baik"]);
+			const sedangData = categories1.map(kel => kelurahanData[kel]["Kerusakan sedang"]);
+			const parahData = categories1.map(kel => kelurahanData[kel]["Kerusakan parah"]);
+
+			const options1 = {
+			series: [
+				{ name: 'Baik', data: baikData },
+				{ name: 'Kerusakan sedang', data: sedangData },
+				{ name: 'Kerusakan parah', data: parahData }
+			],
+			chart: {
+				type: 'bar',
+				height: 200
+			},
+			plotOptions: {
+				bar: {
+				horizontal: false,
+				columnWidth: '60%',
+				borderRadius: 4
+				},
+			},
+			dataLabels: {
+				enabled: false
+			},
+			stroke: {
+				show: true,
+				width: 2,
+				colors: ['transparent']
+			},
+			xaxis: {
+				categories: categories1
+			},
+			yaxis: {
+				title: {
+				text: 'Jumlah Jalan'
+				}
+			},
+			fill: {
+				opacity: 1
+			},
+			tooltip: {
+				y: {
+				formatter: function (val) {
+					return val + " ruas"
+				}
+				}
+			}
+			};
+
+			const chart1 = new ApexCharts(document.querySelector("#chart"), options1);
+			chart1.render();
+
+			// === CHART 2: Jenis Perkerasan ===
+			const perkerasanData = {};
+			geojson.features.forEach(feature => {
+			const props = feature.properties;
+			const kelurahan = props["Kelurahan"];
+			const jenis = props["Jenis Perkerasan"];
+			if (!kelurahan || !jenis) return;
+
+			if (!perkerasanData[kelurahan]) {
+				perkerasanData[kelurahan] = {
+				"Aspal": 0,
+				"Paving Block": 0,
+				"Beton": 0,
+				"Campuran": 0
+				};
+			}
+
+			if (["Aspal", "Paving Block", "Beton", "Campuran"].includes(jenis)) {
+				perkerasanData[kelurahan][jenis]++;
+			}
+			});
+
+			const categories2 = Object.keys(perkerasanData);
+			const aspalData = categories2.map(kel => perkerasanData[kel]["Aspal"]);
+			const pavingData = categories2.map(kel => perkerasanData[kel]["Paving Block"]);
+			const betonData = categories2.map(kel => perkerasanData[kel]["Beton"]);
+			const campuranData = categories2.map(kel => perkerasanData[kel]["Campuran"]);
+
+			const options2 = {
+			series: [
+				{ name: 'Aspal', data: aspalData },
+				{ name: 'Paving Block', data: pavingData },
+				{ name: 'Beton', data: betonData },
+				{ name: 'Campuran', data: campuranData }
+			],
+			chart: {
+				type: 'bar',
+				height: 200
+			},
+			plotOptions: {
+				bar: {
+				horizontal: false,
+				columnWidth: '60%',
+				borderRadius: 4
+				},
+			},
+			dataLabels: {
+				enabled: false
+			},
+			stroke: {
+				show: true,
+				width: 2,
+				colors: ['transparent']
+			},
+			xaxis: {
+				categories: categories2
+			},
+			yaxis: {
+				title: {
+				text: 'Jumlah Jalan'
+				}
+			},
+			fill: {
+				opacity: 1
+			},
+			tooltip: {
+				y: {
+				formatter: function (val) {
+					return val + " ruas"
+				}
+				}
+			}
+			};
+
+			const chart2 = new ApexCharts(document.querySelector("#chart2"), options2);
+			chart2.render();
+
+			// === PIE CHART: Distribusi Jalan/Gang ===
+			const jalanGangCount = {
+			"Jalan": 0,
+			"Gang": 0,
+			"Jalan Setapak": 0
+			};
+
+			geojson.features.forEach(feature => {
+			const props = feature.properties;
+			const jenis = props["Jalan/Gang"];
+			if (jenis && jalanGangCount.hasOwnProperty(jenis)) {
+				jalanGangCount[jenis]++;
+			}
+			});
+
+			const pieLabels = Object.keys(jalanGangCount);
+			const pieSeries = pieLabels.map(label => jalanGangCount[label]);
+
+			const pieOptions = {
+			series: pieSeries,
+			chart: {
+				type: 'donut',
+				width: 300
+			},
+			labels: pieLabels,
+			responsive: [{
+				breakpoint: 480,
+				options: {
+				chart: {
+					width: 280
+				},
+				legend: {
+					position: 'bottom'
+				}
+				}
+			}],
+			tooltip: {
+				y: {
+				formatter: function (val, opts) {
+					const total = pieSeries.reduce((a, b) => a + b, 0);
+					const percent = ((val / total) * 100).toFixed(1);
+					return `${val} (${percent}%)`;
+				}
+				}
+			}
+			};
+
+			const pieChart = new ApexCharts(document.querySelector("#pieChart"), pieOptions);
+			pieChart.render();
+		})
+		.catch(error => {
+			console.error("Gagal memuat GeoJSON:", error);
+		});
+		</script>
+
+		  
+		  
+	</body>
+
+</html>

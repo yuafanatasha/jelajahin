@@ -1,0 +1,130 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="author" content="Untree.co">
+  <link rel="shortcut icon" href="images/logo-jelajahin.png">
+
+  <meta name="description" content="" />
+  <meta name="keywords" content="bootstrap, bootstrap4" />
+
+		<!-- Bootstrap CSS -->
+		<link href="css/bootstrap.min.css" rel="stylesheet">
+		<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+		<link href="css/tiny-slider.css" rel="stylesheet">
+		<link href="css/style.css" rel="stylesheet">
+		<title>Webmap | Jelajahin</title>
+	
+
+	<title>Display LineString in MAPID Maps</title>
+    <meta
+      property="og:description"
+      content="Use extrusions to display buildings' height in 3D."
+    />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/maplibre-gl@5.1.0/dist/maplibre-gl.css"
+    />
+    <script src="https://unpkg.com/maplibre-gl@5.1.0/dist/maplibre-gl.js"></script>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      html,
+      body,
+      #map {
+        height: 100%;
+      }
+    </style>
+</head>
+
+	<body>
+
+		<!-- Start Header/Navigation -->
+		<nav class="custom-navbar navbar navbar navbar-expand-md navbar-dark bg-dark" arial-label="Furni navigation bar">
+
+			<div class="container">
+				<img src="images/logoteks.png" width="150px" alt="Logo">
+
+				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsFurni" aria-controls="navbarsFurni" aria-expanded="false" aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+
+				<div class="collapse navbar-collapse" id="navbarsFurni">
+					<ul class="custom-navbar-nav navbar-nav ms-auto mb-2 mb-md-0">
+						<li><a class="nav-link" href="index.html">Home</a></li>
+						<li class="nav-item active"><a class="nav-link" href="webmap.html">Web Map</a></li>
+						<li><a class="nav-link" href="download.html">Download Data</a></li>
+						<li><a class="nav-link" href="login.html">Log In</a></li>
+					</ul>
+
+					<ul class="custom-navbar-cta navbar-nav mb-2 mb-md-0 ms-5 navmenu">
+						<!-- Dropdown -->
+						<li class="nav-item dropdown">
+						  <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+							<img src="images/user.svg" alt="User">
+						  </a>
+						  <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+							<li><a class="dropdown-item" href="login.html">Sign In/Sign Up</a></li>
+							<li><a class="dropdown-item" href="">Logout</a></li>
+						  </ul>
+						</li>
+					</ul>
+					  
+				</div>
+			</div>
+				
+		</nav>
+		<!-- End Header/Navigation -->
+
+		
+
+		
+
+		<div id="map"></div>
+		<script>
+		const MAP_SERVICE_KEY = "67b74a388bd6017a6d11772a"; // ganti dengan API key Anda yang didapat dari menu map services di geo.mapid.io
+		const map = new maplibregl.Map({
+			style: `https://basemap.mapid.io/styles/street-new-generation/style.json?key=${MAP_SERVICE_KEY}`,
+			center: [107.6117887556604, -6.918605247117273],
+			zoom: 12,
+			pitch: 0,
+			bearing: 0,
+			container: "map",
+			canvasContextAttributes: { antialias: true },
+			attributionControl: true, // attribution control wajib ada sebagai syarat penggunaan mapid maps
+		});
+
+		
+
+		map.on("load", function () {
+			// Tambahkan GeoJSON sebagai sumber data
+			map.addSource("line-source", {
+			type: "geojson",
+			data: geojsonLine,
+			});
+
+			// Tambahkan layer untuk menampilkan garis
+			map.addLayer({
+			id: "line-layer",
+			type: "line",
+			source: "line-source",
+			layout: {
+				"line-join": "round",
+				"line-cap": "round",
+			},
+			paint: {
+				"line-color": "#ff0000", // Warna merah
+				"line-width": 4, // Ketebalan garis
+			},
+			});
+		});
+		</script>
+	</body>
+
+</html>

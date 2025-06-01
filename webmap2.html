@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="author" content="Untree.co">
+  <link rel="shortcut icon" href="images/logo-jelajahin.png">
+
+  <meta name="description" content="" />
+  <meta name="keywords" content="bootstrap, bootstrap4" />
+
+		<!-- Bootstrap CSS -->
+		<link href="css/bootstrap.min.css" rel="stylesheet">
+		<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+		<link href="css/tiny-slider.css" rel="stylesheet">
+		<link href="css/style.css" rel="stylesheet">
+		<title>Webmap | Jelajahin</title>
+
+    <title>View a fullscreen map</title>
+    <meta property="og:description" content="Toggle between current view and fullscreen mode. Does not work on iPhones because a pseudo-fullscreen is used, and the code is embedded in an iframe, which prevents the map from scaling." />
+    <meta charset='utf-8'>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel='stylesheet' href='https://unpkg.com/maplibre-gl@5.3.0/dist/maplibre-gl.css' />
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src='https://unpkg.com/maplibre-gl@5.3.0/dist/maplibre-gl.js'></script>
+	<!-- Geocoder CSS dan JS -->
+
+	<!-- MapTiler Geocoding Control -->
+	<link href="https://unpkg.com/@maptiler/geocoding-control@latest/style.css" rel="stylesheet">
+	<script src="https://unpkg.com/@maptiler/geocoding-control@latest/maplibregl.umd.js"></script>
+  
+    <style>
+        body { margin: 0; padding: 0; }
+        html, body { height: 100%; }
+		#map {
+			position: absolute;
+			top: 60px; /* Sesuaikan ini dengan tinggi navbar kamu */
+			bottom: 0;
+			width: 100%;
+			z-index: 1;
+		}
+		#info {
+			position: absolute;
+			bottom: 5px;
+			left: 15%;
+			transform: translate(-50%);
+			width: 20%;
+			padding: 5px;
+			border: none;
+			border-radius: 3px;
+			font-size: 12px;
+			text-align: center;
+			color: #222;
+			background: #ffde59;
+			z-index: 999; /* <--- Tambahkan ini */
+			box-shadow: 0 2px 6px rgba(0,0,0,0.2); /* opsional biar kelihatan elegan */
+		}
+
+		.distance-container {
+        position: absolute;
+        bottom: 40px;
+        right: 10px;
+        z-index: 1;
+    	}
+
+    	.distance-container > * {
+        background-color: rgba(0, 0, 0, 0.5);
+        color: #fff;
+        font-size: 11px;
+        line-height: 18px;
+        display: block;
+        margin: 0;
+        padding: 5px 10px;
+        border-radius: 3px;
+    	}
+
+		.controls {
+		position: absolute;
+		bottom: 310px;
+		right: 10px;
+		z-index: 2;
+		display: flex;
+		flex-direction: column;
+		gap: 5px;
+		}
+
+		.controls button {
+		padding: 4px 9px;
+		font-size: 12px;
+		border: none;
+		border-radius: 3px;
+		cursor: pointer;
+		background-color: #792a0b;
+		color: white;
+		}
+
+		.controls button:hover {
+		background-color: #792a0b;
+		}
+
+		/* Styling posisi pencarian */
+		.maplibregl-ctrl-top-left .maplibregl-ctrl.custom-geocoder {
+		margin-bottom: 300px !important;
+		}
+		
+		#search-container {
+		position: absolute;
+		top: 80px; /* ubah sesuai kebutuhan */
+		left: 55%;
+		transform: translateX(-50%);
+		z-index: 999;
+		width: 400px; /* atau sesuaikan */
+		}
+
+		/* Custom checkbox container */
+		.custom-checkbox {
+		position: relative;
+		padding-left: 30px;
+		margin-bottom: 8px;
+		cursor: pointer;
+		display: inline-block;
+		font-size: 14px;
+		color: black;
+		user-select: none;
+		}
+
+		/* Hide default checkbox */
+		.custom-checkbox input[type="checkbox"] {
+		position: absolute;
+		opacity: 0;
+		cursor: pointer;
+		}
+
+		/* Custom checkmark box */
+		.custom-checkbox .checkmark {
+		position: absolute;
+		top: 0;
+		left: 0;
+		height: 18px;
+		width: 18px;
+		background-color: #eee;
+		border: 2px solid #ccc;
+		border-radius: 4px;
+		}
+
+		/* Saat dicentang - warna hijau */
+		.custom-checkbox input:checked ~ .checkmark {
+		background-color: #792a0b; /* hijau */
+		border-color: #ffde59;
+		}
+
+		/* Tanda centang */
+		.custom-checkbox .checkmark:after {
+		content: "";
+		position: absolute;
+		display: none;
+		}
+
+		/* Tampilkan tanda centang saat dicentang */
+		.custom-checkbox input:checked ~ .checkmark:after {
+		display: block;
+		}
+
+		/* Bentuk centang */
+		.custom-checkbox .checkmark:after {
+		left: 6px;
+		top: 2px;
+		width: 4px;
+		height: 9px;
+		border: solid white;
+		border-width: 0 2px 2px 0;
+		transform: rotate(45deg);
+		}
+
+    </style>
+</head>
+<body>
+		<!-- Start Header/Navigation -->
+		<nav class="custom-navbar navbar navbar navbar-expand-md navbar-dark bg-dark" arial-label="Furni navigation bar">
+
+			<div class="container">
+				<img src="images/logoteks.png" width="150px" alt="Logo">
+
+				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsFurni" aria-controls="navbarsFurni" aria-expanded="false" aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+
+				<div class="collapse navbar-collapse" id="navbarsFurni">
+					<ul class="custom-navbar-nav navbar-nav ms-auto mb-2 mb-md-0">
+						<li><a class="nav-link" href="index.html">Home</a></li>
+						<li class="nav-item active"><a class="nav-link" href="webmap2.html">Web Map</a></li>
+						<li><a class="nav-link" href="dashboard.html">Dashboard</a></li>
+					</ul>
+
+					<ul class="custom-navbar-cta navbar-nav mb-2 mb-md-0 ms-5 navmenu">
+						<!-- Dropdown -->
+						
+					</ul>
+					  
+				</div>
+			</div>
+				
+		</nav>
+		<!-- End Header/Navigation -->
+
+
+
+
+<div id="map"></div>
+<pre id="info"></pre>
+<div class="controls">
+	<button id="toggleMeasurement" title="Start/Stop Measurement">
+	  <i class="fas fa-ruler"></i>
+	</button>
+	<button id="clearMeasurement" title="Clear Measurement">
+	  <i class="fas fa-times"></i>
+	</button>
+</div>
+<div id="distance" class="distance-container">Total distance: 0 km</div>
+<div id="search-container"></div>
+<!-- Tombol toggle panel -->
+<button id="layerToggleBtn" style="
+	position: absolute;
+	top: 80px;
+	left: 15px;
+	z-index: 1000;
+	background-color: #792a0b;
+	border: none;
+	border-radius: 6px;
+	box-shadow: 0 2px 5px #fff(0,0,0,0.2);
+	padding: 8px 10px;
+	cursor: pointer;
+">
+	<i class="fas fa-layer-group" style="color: #ffffff;"></i>
+</button>
+
+<!-- Panel kontrol layer -->
+<div id="layer-toggle" style="
+	display: none;
+	position: absolute;
+	top: 80px;
+	left: 60px;
+	background: #ffde59;
+	padding: 15px 40px;
+	z-index: 999;
+	border-radius: 8px;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+	font-size: 13px;
+	font-family: 'Segoe UI', sans-serif;
+	line-height: 1.6;
+">
+
+	<strong style="display: block; margin-bottom: 15px;">Layer Control</strong>
+	<label class="custom-checkbox">
+		<input type="checkbox" id="togglebatastegalrejo" checked>
+		<span class="checkmark"></span>
+		Batas Kemantren Tegalrejo
+	  </label><br>
+	  <label class="custom-checkbox" style="margin-bottom: 2px;">
+	  <input type="checkbox" id="togglejalan" checked>
+	  <span class="checkmark"></span>
+	  Jaringan Jalan 
+	</label>
+	
+	<div id="legend-jalan" style="margin-left: 30px;">
+		<div style="display: flex; align-items: center; margin-top: 0px;">
+		  <span style="width: 14px; height: 4px; background-color: #FF0000; display: inline-block; margin-right: 8px;"></span>
+		  <span style="font-size: 12px;">Jalan</span>
+		</div>
+		<div style="display: flex; align-items: center; margin-top: 0px;">
+		  <span style="width: 14px; height: 4px; background-color: #0000FF; display: inline-block; margin-right: 8px;"></span>
+		  <span style="font-size: 12px;">Gang</span>
+		</div>
+		<div style="display: flex; align-items: center; margin-top: 0px;">
+		  <span style="width: 14px; height: 4px; background-color: #00FF00; display: inline-block; margin-right: 8px;"></span>
+		  <span style="font-size: 12px;">Jalan Setapak</span>
+		</div>
+	  </div>
+</div>
+
+
+<!-- Tombol filter -->
+<button id="filterToggleBtn" style="
+	position: absolute;
+	top: 130px;
+	left: 15px;
+	z-index: 1000;
+	background-color: #792a0b;
+	border: none;
+	border-radius: 6px;
+	padding: 8px 10px;
+	cursor: pointer;
+">
+	<i class="fas fa-filter" style="color: #ffffff;"></i>
+</button>
+
+<!-- Panel filter -->
+<div id="filter-panel" style="
+	display: none;
+	position: absolute;
+	top: 130px;
+	left: 60px;
+	background: #ffde59;
+	padding: 15px;
+	z-index: 999;
+	border-radius: 8px;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+	font-size: 13px;
+	font-family: 'Segoe UI', sans-serif;
+	line-height: 1.6;
+">
+	<strong>Filter Jalan</strong><br><br>
+
+	<label for="filter-kelurahan">Kelurahan:</label><br>
+	<select id="filter-kelurahan">
+		<option value="">Semua</option>
+	</select><br><br>
+
+	<label for="filter-kondisi">Kondisi Jalan:</label><br>
+	<select id="filter-kondisi">
+		<option value="">Semua</option>
+	</select><br><br>
+
+	<label for="filter-jenisperkerasan">Jenis Perkerasan:</label><br>
+	<select id="filter-jenisperkerasan">
+		<option value="">Semua</option>
+	</select><br><br>
+
+	<label for="filter-jenisjalan">Jenis Jalan:</label><br>
+	<select id="filter-jenisjalan">
+		<option value="">Semua</option>
+	</select><br><br>
+
+	<button id="applyFilterBtn" style="background-color: #792a0b; color: white; padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer;">Terapkan Filter</button>
+</div>
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/@turf/turf@7/turf.min.js"></script>
+<script>
+    const map = new maplibregl.Map({
+        container: 'map', // container id
+        style:
+		'https://api.maptiler.com/maps/landscape/style.json?key=E1yCSpJJ0Y6k68aAUOk3', //stylesheet location
+        center: [110.355, -7.78], // starting position
+        zoom: 13 // starting zoom
+    });
+
+    map.addControl(new maplibregl.FullscreenControl());
+
+	let dataSMA;
+	let dataWilayah;
+
+	// Ambil kedua data, lalu lanjut saat keduanya sudah selesai
+	Promise.all([
+	fetch("batastegalrejo.geojson").then((res) => res.json()),
+	fetch("uji2.geojson").then((res) => res.json())
+	]).then(([tegalrejobatas, tegalrejojalan]) => {
+	batastegalrejo = tegalrejobatas;
+	jalan = tegalrejojalan;
+
+	fillFilterOptions(jalan);
+
+	console.log("Batas Kemantren Tegalrejo:", batastegalrejo);
+	console.log("Jalan Kemantren Tegalrejo:", jalan);
+
+	map.on("load", () => {
+		console.log("Map loaded");
+
+
+		// Tambah source batas tegalrejo
+		map.addSource("batastegalrejo-source", {
+		type: "geojson",
+		data: batastegalrejo,
+		});
+
+		// Tambah source jalan tegalrejo
+		map.addSource("jalan-source", {
+		type: "geojson",
+		data: jalan,
+		});
+
+		// untuk layer batas tegalrejo
+		map.addLayer({
+		id: "batastegalrejo-layer",
+		type: "fill",
+		source: "batastegalrejo-source",
+		paint: {
+			"fill-color": "#FFB22C",
+			"fill-opacity": 0.6,
+		},
+		});
+
+
+		// untuk layer jalan tegalrejo
+		map.addLayer({
+			id: "jalan-layer",
+			type: "line",
+			source: "jalan-source",
+			paint: {
+				"line-color": [
+				"match",
+				["get", "Jalan/Gang"],
+				"Jalan", "#FF0000",     // Merah
+				"Gang", "#0000FF",   // Biru
+				"Jalan Setapak", "#00FF00",      // Hijau
+				"#CCCCCC" // default: Abu-abu jika tidak cocok
+				],
+				"line-width": 2
+			}
+		});
+
+
+        const popup = new maplibregl.Popup({
+        closeButton: false,
+        closeOnClick: false
+        });
+
+        // Tampilkan popup saat hover
+        map.on("mouseenter", "jalan-layer", (e) => {
+        map.getCanvas().style.cursor = "pointer";
+
+        const coordinates = e.lngLat;
+        const properties = e.features[0].properties;
+        let content = "<b>Info Line:</b><br>";
+
+        // Tampilkan semua atribut
+        for (let key in properties) {
+            content += `<strong>${key}</strong>: ${properties[key]}<br>`;
+        }
+
+        popup.setLngLat(coordinates).setHTML(content).addTo(map);
+        });
+
+        map.on("mouseleave", "jalan-layer", () => {
+        map.getCanvas().style.cursor = "";
+        popup.remove();
+        });
+        });
+
+
+
+		// Event klik pada titik
+		map.on("click", "points-layer", function (e) {
+		const coordinates = e.features[0].geometry.coordinates.slice();
+		const title = e.features[0].properties.name;
+
+		new maplibregl.Popup()
+			.setLngLat(coordinates)
+			.setHTML(`<b>${title}</b>`)
+			.addTo(map);
+		});
+
+		// Ubah kursor saat mengarah ke titik
+		map.on("mouseenter", "points-layer", function () {
+		map.getCanvas().style.cursor = "pointer";
+		});
+
+		map.on("mouseleave", "points-layer", function () {
+		map.getCanvas().style.cursor = "";
+		});
+		// Fungsi untuk toggle visibility
+
+		const layerToggleBtn = document.getElementById("layerToggleBtn");
+		const layerTogglePanel = document.getElementById("layer-toggle");
+
+		layerToggleBtn.addEventListener("click", () => {
+		const isVisible = layerTogglePanel.style.display === "block";
+		layerTogglePanel.style.display = isVisible ? "none" : "block";
+
+		// Sembunyikan filter panel jika sedang terlihat
+		const filterPanel = document.getElementById("filter-panel");
+		if (filterPanel.style.display === "block") {
+			filterPanel.style.display = "none";
+		}
+	});
+
+		function toggleLayer(id, isChecked) {
+			const visibility = isChecked ? "visible" : "none";
+			if (map.getLayer(id)) {
+				map.setLayoutProperty(id, "visibility", visibility);
+			}
+		}
+
+		// Listener toggle layer
+		
+		document.getElementById("togglebatastegalrejo").addEventListener("change", (e) => {
+			toggleLayer("batastegalrejo-layer", e.target.checked);
+		});
+		document.getElementById("togglejalan").addEventListener("change", (e) => {
+			toggleLayer("jalan-layer", e.target.checked);
+		});
+
+	});
+
+
+	//untuk filter
+	document.getElementById("filterToggleBtn").addEventListener("click", () => {
+	const panel = document.getElementById("filter-panel");
+	const layerPanel = document.getElementById("layer-toggle"); // ambil elemen layer toggle
+
+	const isPanelVisible = panel.style.display === "block";
+	panel.style.display = isPanelVisible ? "none" : "block";
+
+	// Sembunyikan panel layer jika sedang terlihat
+	if (layerPanel.style.display === "block") {
+		layerPanel.style.display = "none";
+	}
+});
+
+function fillFilterOptions(data) {
+	const kelurahans = new Set();
+	const kondisi = new Set();
+	const jenisperkerasan = new Set();
+	const jenisjalan = new Set();
+
+	data.features.forEach(f => {
+		kelurahans.add(f.properties["Kelurahan"]);
+		kondisi.add(f.properties["Kondisi Jalan"]);
+		jenisperkerasan.add(f.properties["Jenis Perkerasan"]);
+		jenisjalan.add(f.properties["Jalan/Gang"]);
+	});
+
+	const fillSelect = (id, values) => {
+		const select = document.getElementById(id);
+		select.innerHTML = '<option value="">Semua</option>'; // Default "Semua"
+		values.forEach(val => {
+			if (val && val.trim() !== "") { // Hindari value kosong
+				const option = document.createElement("option");
+				option.value = val;
+				option.textContent = val;
+				select.appendChild(option);
+			}
+		});
+	};
+
+	fillSelect("filter-kelurahan", kelurahans);
+	fillSelect("filter-kondisi", kondisi);
+	fillSelect("filter-jenisperkerasan", jenisperkerasan);
+	fillSelect("filter-jenisjalan", jenisjalan);
+}
+
+
+
+	document.getElementById("applyFilterBtn").addEventListener("click", () => {
+		const kelurahan = document.getElementById("filter-kelurahan").value;
+		const kondisi = document.getElementById("filter-kondisi").value;
+		const jenisperkerasan = document.getElementById("filter-jenisperkerasan").value;
+		const jenisjalan = document.getElementById("filter-jenisjalan").value;
+		
+
+		let filters = ["all"];
+
+		if (kelurahan) filters.push(["==", ["get", "Kelurahan"], kelurahan]);
+		if (kondisi) filters.push(["==", ["get", "Kondisi Jalan"], kondisi]);
+		if (jenisperkerasan) filters.push(["==", ["get", "Jenis Perkerasan"], jenisperkerasan]);
+		if (jenisjalan) filters.push(["==", ["get", "Jalan/Gang"], jenisjalan]);
+
+		map.setFilter("jalan-layer", filters.length > 1 ? filters : null); // null = semua
+	});
+
+
+
+
+	
+	const apiKey = 'E1yCSpJJ0Y6k68aAUOk3';
+	map.on('load', () => {
+      const geocoderControl = new maplibreglMaptilerGeocoder.GeocodingControl({
+        apiKey: apiKey,
+        maplibregl: maplibregl,
+        className: 'custom-geocoder' // Kelas untuk CSS
+      });
+	  const geocoderElement = geocoderControl.onAdd(map);
+	document.getElementById('search-container').appendChild(geocoderElement);
+    });
+	
+	var geojsonLine = {
+			type: "FeatureCollection",
+			features: [
+			{
+				type: "Feature",
+				geometry: {
+				type: "LineString",
+				coordinates: [
+					[0, 0], // Titik awal garis
+					[0, 0], // Titik kedua
+					[0, 0], // Titik akhir
+				],
+				},
+				properties: {
+				name: "Rute Contoh",
+				},
+			},
+			],
+		};
+		
+		map.on("load", function () {
+			// Tambahkan GeoJSON sebagai sumber data
+			map.addSource("line-source", {
+			type: "geojson",
+			data: geojsonLine,
+			});
+
+			// Tambahkan layer untuk menampilkan garis
+			map.addLayer({
+			id: "line-layer",
+			type: "line",
+			source: "line-source",
+			layout: {
+				"line-join": "round",
+				"line-cap": "round",
+			},
+			paint: {
+				"line-color": "#ff0000", // Warna merah
+				"line-width": 4, // Ketebalan garis
+			},
+			});
+		});
+
+		// Add zoom and rotation controls to the map.
+		map.addControl(new maplibregl.NavigationControl({
+        visualizePitch: true,
+        visualizeRoll: true,
+        showZoom: true,
+        showCompass: true
+    	}));
+
+
+		
+		map.on('mousemove', (e) => {
+		const lng = e.lngLat.lng.toFixed(3);
+		const lat = e.lngLat.lat.toFixed(3);
+		document.getElementById('info').innerHTML = `Koordinat: <strong>${lng}, ${lat}</strong>`;
+		});
+
+		// Add geolocate control to the map.
+		map.addControl(
+        new maplibregl.GeolocateControl({
+            positionOptions: {
+                enableHighAccuracy: true
+            },
+            trackUserLocation: true
+        })
+    	);
+
+		
+
+		let isMeasuring = false;
+		const toggleBtn = document.getElementById('toggleMeasurement');
+		const clearBtn = document.getElementById('clearMeasurement');
+		const distanceContainer = document.getElementById('distance');
+
+		const geojson = {
+			type: 'FeatureCollection',
+			features: []
+		};
+
+		const linestring = {
+			type: 'Feature',
+			geometry: {
+			type: 'LineString',
+			coordinates: []
+			}
+		};
+
+		toggleBtn.addEventListener('click', () => {
+			isMeasuring = !isMeasuring;
+			toggleBtn.style.backgroundColor = isMeasuring ? '#ffde59' : '#792a0b'; // Hijau saat aktif
+		});
+
+		clearBtn.addEventListener('click', () => {
+			geojson.features = [];
+			linestring.geometry.coordinates = [];
+			map.getSource('geojson').setData(geojson);
+			distanceContainer.textContent = 'Total distance: 0 km';
+		});
+
+		map.on('load', () => {
+			map.addSource('geojson', {
+			type: 'geojson',
+			data: geojson
+			});
+
+			map.addLayer({
+			id: 'measure-points',
+			type: 'circle',
+			source: 'geojson',
+			paint: {
+				'circle-radius': 5,
+				'circle-color': '#000'
+			},
+			filter: ['in', '$type', 'Point']
+			});
+
+			map.addLayer({
+			id: 'measure-lines',
+			type: 'line',
+			source: 'geojson',
+			layout: {
+				'line-cap': 'round',
+				'line-join': 'round'
+			},
+			paint: {
+				'line-color': '#000',
+				'line-width': 2.5
+			},
+			filter: ['in', '$type', 'LineString']
+			});
+
+			map.on('click', (e) => {
+			if (!isMeasuring) return;
+
+			const features = map.queryRenderedFeatures(e.point, {
+				layers: ['measure-points']
+			});
+
+			if (geojson.features.length > 1) geojson.features.pop();
+			distanceContainer.textContent = '';
+
+			if (!features.length) {
+				const point = {
+				type: 'Feature',
+				geometry: {
+					type: 'Point',
+					coordinates: [e.lngLat.lng, e.lngLat.lat]
+				},
+				properties: {
+					id: String(Date.now())
+				}
+				};
+				geojson.features.push(point);
+			}
+
+			if (geojson.features.length > 1) {
+				linestring.geometry.coordinates = geojson.features.map(p => p.geometry.coordinates);
+				geojson.features.push(linestring);
+
+				const total = turf.length(linestring);
+				distanceContainer.textContent = `Total distance: ${total.toFixed(2)} km`;
+			}
+
+			map.getSource('geojson').setData(geojson);
+			});
+
+			map.on('mousemove', (e) => {
+			const features = map.queryRenderedFeatures(e.point, {
+				layers: ['measure-points']
+			});
+			map.getCanvas().style.cursor = features.length ? 'pointer' : (isMeasuring ? 'crosshair' : '');
+			});
+		});
+
+
+
+</script>
+</body>
+</html>
