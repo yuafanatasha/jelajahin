@@ -1,6 +1,6 @@
 {
 "type": "FeatureCollection",
-"name": "BISMILLAHHJELAJAHIN",
+"name": "uji2",
 "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
 "features": [
 { "type": "Feature", "properties": { "Kelurahan": "Karangwaru", "Nama jalan": "Gang Soka", "Kode Jalan": "TN101", "Jalan/Gang": "Gang", "Lebar Jalan": 2.1, "Jenis Perkerasan": "Paving Block", "Kondisi Jalanlan": "Baik" }, "geometry": { "type": "MultiLineString", "coordinates": [ [ [ 110.363390731072457, -7.774198417605379 ], [ 110.362747866882529, -7.774005655024579 ], [ 110.362747866882529, -7.774005655024579 ] ] ] } },
